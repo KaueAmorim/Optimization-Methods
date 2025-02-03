@@ -71,6 +71,21 @@ def fin_diff(f, x, degree, h=1e-6):
     else:
         raise ValueError("degree deve ser 1 (gradiente) ou 2 (Hessiana).")
 
+def plot_trajectory(f, trajectory):
+    
+    """ Plota a trajetória do algoritmo de otimização em R². """
+    
+    trajectory = np.array(trajectory)
+    x_vals = np.linspace(min(trajectory[:, 0]) - 1, max(trajectory[:, 0]) + 1, 100)
+    y_vals = np.linspace(min(trajectory[:, 1]) - 1, max(trajectory[:, 1]) + 1, 100)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    Z = np.array([[f(np.array([xx, yy])) for xx in x_vals] for yy in y_vals])
+
+    plt.figure(figsize=(8, 6))
+    plt.contour(X, Y, Z, levels=50, cmap="viridis")
+    plt.plot(trajectory[:, 0], trajectory[:, 1], marker='o', color='red')
+    plt.show()
+
 def gd(f, x0, grad, eps = 1e-5, alpha = 0.1, itmax = 10000, fd = False, h = 1e-7, plot = False, search = False):
 
     """
@@ -123,16 +138,7 @@ def gd(f, x0, grad, eps = 1e-5, alpha = 0.1, itmax = 10000, fd = False, h = 1e-7
             trajectory.append(x.copy())
 
     if plot and len(x0) == 2:
-        trajectory = np.array(trajectory)
-        x_vals = np.linspace(min(trajectory[:, 0]) - 1, max(trajectory[:, 0]) + 1, 100)
-        y_vals = np.linspace(min(trajectory[:, 1]) - 1, max(trajectory[:, 1]) + 1, 100)
-        X, Y = np.meshgrid(x_vals, y_vals)
-        Z = np.array([[f(np.array([xx, yy])) for xx in x_vals] for yy in y_vals])
-
-        plt.figure(figsize=(8, 6))
-        plt.contour(X, Y, Z, levels=50, cmap="viridis")
-        plt.plot(trajectory[:, 0], trajectory[:, 1], marker='o', color='red')
-        plt.show()
+        plot_trajectory(f, trajectory)
 
     return x, k
 
@@ -172,16 +178,7 @@ def newton(f, x0, grad, hess, eps = 1e-5, alpha = 0.1, itmax = 10000, fd = False
         trajectory.append(x.copy())
 
     if plot and len(x0) == 2:
-        trajectory = np.array(trajectory)
-        x_vals = np.linspace(min(trajectory[:, 0]) - 1, max(trajectory[:, 0]) + 1, 100)
-        y_vals = np.linspace(min(trajectory[:, 1]) - 1, max(trajectory[:, 1]) + 1, 100)
-        X, Y = np.meshgrid(x_vals, y_vals)
-        Z = np.array([[f(np.array([xx, yy])) for xx in x_vals] for yy in y_vals])
-
-        plt.figure(figsize=(8, 6))
-        plt.contour(X, Y, Z, levels=50, cmap="viridis")
-        plt.plot(trajectory[:, 0], trajectory[:, 1], marker='o', color='red')
-        plt.show()
+        plot_trajectory(f, trajectory)
 
     return x, k
 
@@ -228,16 +225,7 @@ def bfgs(f, x0, grad, eps=1e-5, alpha=0.1, itmax=10000, fd=False, h=1e-7, plot=F
         trajectory.append(x.copy())
 
     if plot and len(x0) == 2:
-        trajectory = np.array(trajectory)
-        x_vals = np.linspace(min(trajectory[:, 0]) - 1, max(trajectory[:, 0]) + 1, 100)
-        y_vals = np.linspace(min(trajectory[:, 1]) - 1, max(trajectory[:, 1]) + 1, 100)
-        X, Y = np.meshgrid(x_vals, y_vals)
-        Z = np.array([[f(np.array([xx, yy])) for xx in x_vals] for yy in y_vals])
-
-        plt.figure(figsize=(8, 6))
-        plt.contour(X, Y, Z, levels=50, cmap="viridis")
-        plt.plot(trajectory[:, 0], trajectory[:, 1], marker='o', color='red')
-        plt.show()
+        plot_trajectory(f, trajectory)
 
     return x, k
 
@@ -273,6 +261,6 @@ def grad_f3(x):
         2 * (x[0]**2 + x[1] - 11) + 4 * x[1] * (x[0] + x[1]**2 - 7)
     ])
 
-x,k = gd(f2,np.array([0,0]),grad_f2,plot = True)
-print(f"x = {x}")
-print(f"k = {k}")
+x_opt, iters = bfgs(f3, np.array([0,0]), grad_f3, fd=True, plot=True, search=True)
+print(f"Resultado: {x_opt}")  
+print(f"Iterações: {iters}")
